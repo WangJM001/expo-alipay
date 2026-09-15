@@ -1,6 +1,6 @@
 {
   "name": "@jayming/expo-alipay",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Expo module for Alipay SDK integration with iOS and Android support",
   "main": "build/index.js",
   "types": "build/index.d.ts",
