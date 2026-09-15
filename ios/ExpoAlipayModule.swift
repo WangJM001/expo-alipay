@@ -23,6 +23,11 @@ public class ExpoAlipayModule: Module {
       self.appId = appId
     }
 
+    // iOS AlipaySDK 无沙箱切换接口，保留方法仅为与 Android 端 API 对齐，no-op。
+    Function("setSandboxEnabled") { (_ enabled: Bool) in
+      self.log("setSandboxEnabled called but iOS AlipaySDK has no sandbox switch, ignored")
+    }
+
     AsyncFunction("pay") { (orderString: String, promise: Promise) in
       self.log("Starting payment with scheme: \(self.alipayScheme)")
       

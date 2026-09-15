@@ -19,6 +19,10 @@ class ExpoAlipayWeb {
     this.appId = appId;
   }
 
+  setSandboxEnabled(_enabled: boolean): void {
+    // no-op：Web 端没有沙箱/生产环境概念
+  }
+
   async pay(_orderString: string): Promise<AlipayPaymentResult> {
     return Promise.reject(
       new Error('ExpoAlipay: `pay` is not supported on web. Use H5 redirect flow from your server.')

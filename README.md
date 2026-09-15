@@ -8,6 +8,7 @@ Expo 支付宝 SDK 集成模块,支持 iOS 和 Android 平台。
 - ✅ 手机网站转 APP 支付（H5 支付）
 - ✅ 支付宝授权
 - ✅ 检查支付宝是否已安装
+- ✅ 沙箱/生产环境切换（Android）
 - ✅ 自动配置(通过 Config Plugin)
 - ✅ TypeScript 支持
 - ✅ iOS & Android 原生支持
@@ -86,6 +87,10 @@ ExpoAlipay.setAlipayScheme('your-app-scheme');
 
 // 2. 设置 App ID
 ExpoAlipay.setAppId('your-alipay-app-id');
+
+// 2.1 沙箱联调时需要切换到沙箱环境（仅 Android 生效，必须在 pay()/auth() 之前调用；
+//     不调用则 Android 端默认使用生产环境，即使 orderString 是沙箱私钥签发的也一样）
+ExpoAlipay.setSandboxEnabled(true);
 
 // 3. 检查支付宝是否已安装
 const isInstalled = await ExpoAlipay.isAlipayInstalled();
@@ -249,6 +254,27 @@ async function fetchAuthInfoFromServer() {
 **参数:**
 
 - `appId`: 支付宝开放平台申请的 App ID
+
+### `setSandboxEnabled(enabled: boolean): void`
+
+切换支付宝 SDK 使用的沙箱/生产环境。**仅 Android 生效**——iOS 的 `AlipaySDK` 没有对应的环境切换接口，App 支付沙箱环境目前只支持 Android 客户端接入（参考支付宝官方文档《APP 支付如何使用沙箱环境联调》），iOS 端调用此方法为 no-op。
+
+必须在调用 `pay()`/`auth()` 之前调用。**如果不调用，Android 端默认使用生产环境**——即使服务端签发的 `orderString` 是用沙箱私钥（PKCS1）生成的，Android 原生 SDK 仍会按生产环境处理该请求，可能导致沙箱联调时出现签名正确但支付流程报错的情况。
+
+**参数:**
+
+- `enabled`: `true` 切换到沙箱环境，`false` 切换到生产环境
+
+**示例:**
+
+```typescript
+// 沙箱联调
+if (__DEV__) {
+  ExpoAlipay.setSandboxEnabled(true);
+}
+
+const result = await ExpoAlipay.pay(orderString);
+```
 
 ### `pay(orderString: string): Promise<AlipayPaymentResult>`
 

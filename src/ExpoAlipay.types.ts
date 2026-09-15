@@ -39,6 +39,14 @@ export interface ExpoAlipayModule extends NativeModule<AlipayEvents> {
   setAppId(appId: string): void;
 
   /**
+   * 切换支付宝 SDK 的沙箱/生产环境（仅 Android 生效，iOS 无此能力）。
+   * 必须在 pay()/auth() 之前调用，否则 Android 端默认使用生产环境。
+   *
+   * @param enabled true 切换到沙箱环境，false 切换到生产环境
+   */
+  setSandboxEnabled(enabled: boolean): void;
+
+  /**
    * 发起支付宝支付
    * @param orderString 订单信息字符串(从服务端获取)
    * @returns Promise<AlipayPaymentResult> 支付结果

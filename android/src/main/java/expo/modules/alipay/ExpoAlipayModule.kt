@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.util.Log
 import com.alipay.sdk.app.PayTask
 import com.alipay.sdk.app.AuthTask
+import com.alipay.sdk.app.EnvUtils
 import com.alipay.sdk.app.H5PayCallback
 import com.alipay.sdk.util.H5PayResultModel
 import expo.modules.kotlin.modules.Module
@@ -34,6 +35,12 @@ class ExpoAlipayModule : Module() {
     Function("setAppId") { appId: String ->
       this@ExpoAlipayModule.appId = appId
       Log.d("ExpoAlipay", "App ID set: $appId")
+    }
+
+    // 沙箱/生产环境切换，必须在 pay()/auth() 之前调用，否则默认使用生产环境。
+    Function("setSandboxEnabled") { enabled: Boolean ->
+      EnvUtils.setEnv(if (enabled) EnvUtils.EnvEnum.SANDBOX else EnvUtils.EnvEnum.ONLINE)
+      Log.d("ExpoAlipay", "Alipay env set: ${if (enabled) "SANDBOX" else "ONLINE"}")
     }
 
     AsyncFunction("pay") { orderString: String, promise: Promise ->
