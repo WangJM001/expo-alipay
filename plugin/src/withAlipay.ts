@@ -175,29 +175,25 @@ const withAlipayAppDelegate: ConfigPlugin = (config) => {
 const withAlipayAndroid: ConfigPlugin = (config) => {
   return withAndroidManifest(config, (config) => {
     const androidManifest = config.modResults.manifest;
-
-    // 确保 queries 标签存在
-    if (!androidManifest.queries) {
+    if (!androidManifest.queries || androidManifest.queries.length === 0) {
       androidManifest.queries = [{ package: [] }];
     }
 
     const queries = androidManifest.queries[0];
-
-    // 添加支付宝 package
     if (!queries.package) {
       queries.package = [];
     }
 
-    const alipayPackage = {
-      $: { 'android:name': 'com.eg.android.AlipayGphone' },
-    };
-
-    const hasAlipayPackage = queries.package.some(
-      (pkg: any) => pkg.$['android:name'] === 'com.eg.android.AlipayGphone'
-    );
-
-    if (!hasAlipayPackage) {
-      queries.package.push(alipayPackage);
+    // Android 11+ 需要在 queries 中声明目标包，否则无法通过 PackageManager 检测安装状态。
+    const packageNames = ['com.eg.android.AlipayGphone', 'com.eg.android.AlipayGphoneRC'];
+    for (const packageName of packageNames) {
+      // 保持插件幂等，多次执行 prebuild 时不重复添加包名。
+      const exists = queries.package.some(
+        (pkg: any) => pkg.$?.['android:name'] === packageName
+      );
+      if (!exists) {
+        queries.package.push({ $: { 'android:name': packageName } });
+      }
     }
 
     return config;

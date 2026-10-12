@@ -360,9 +360,16 @@ interface AlipayAuthResult {
 
 检查支付宝是否已安装。
 
+Android 同时支持正式版和沙箱版支付宝：
+
+- 正式版包名：`com.eg.android.AlipayGphone`
+- 沙箱版包名：`com.eg.android.AlipayGphoneRC`
+- 两个版本可以共存；任意一个版本已安装时均返回 `true`
+- 两个版本均未安装时返回 `false`
+
 **返回值:**
 
-- `Promise<boolean>`: 是否已安装支付宝
+- `Promise<boolean>`: 是否安装了正式版或沙箱版支付宝
 
 ## 常见问题
 
@@ -372,7 +379,7 @@ interface AlipayAuthResult {
 
 ### 2. Android 找不到支付宝应用?
 
-Config Plugin 会自动在 `AndroidManifest.xml` 中添加 `queries` 配置,确保在添加 plugin 后重新运行 `npx expo prebuild`。
+Config Plugin 会自动在 `AndroidManifest.xml` 的 `queries` 中添加正式版和沙箱版支付宝包名，以确保 Android 11 及以上系统能够检测安装状态。添加或升级 plugin 后需要重新运行 `npx expo prebuild`。
 
 ### 3. 订单信息从哪里获取?
 

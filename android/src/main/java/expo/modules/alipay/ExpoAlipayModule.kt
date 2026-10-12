@@ -172,17 +172,27 @@ class ExpoAlipayModule : Module() {
 
     AsyncFunction("isAlipayInstalled") { promise: Promise ->
       try {
-        val context = appContext.reactContext
-        val packageManager = context?.packageManager
-        var isInstalled = false
-        
-        try {
-          packageManager?.getPackageInfo("com.eg.android.AlipayGphone", 0)
-          isInstalled = true
-        } catch (e: Exception) {
-          isInstalled = false
+        val packageManager = appContext.reactContext?.packageManager
+        if (packageManager == null) {
+          promise.resolve(false)
+          return@AsyncFunction
         }
-        
+
+        // 正式版与沙箱版支付宝可以共存，任一包存在即视为已安装。
+        val packageNames = listOf(
+          "com.eg.android.AlipayGphone",
+          "com.eg.android.AlipayGphoneRC"
+        )
+        val isInstalled = packageNames.any { packageName ->
+          try {
+            packageManager.getPackageInfo(packageName, 0)
+            true
+          } catch (_: Exception) {
+            // 当前包不可见或未安装时继续检测下一个包。
+            false
+          }
+        }
+
         promise.resolve(isInstalled)
       } catch (e: Exception) {
         promise.reject("E_ALIPAY_ERROR", e.message, e)
